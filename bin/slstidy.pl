@@ -151,3 +151,56 @@ Full license text is available at:
 <http://dev.perl.org/licenses/>
 
 =end markdown
+
+
+=head1 NAME
+
+slstidy - script short description
+
+
+=head1 SYNOPSIS
+
+C<<< slstidy.pl [--option] <arguments> >>>
+
+
+=head1 DESCRIPTION
+
+slstidy.pl script long description
+
+
+=head1 OPTIONS
+
+B<--help> show help synopsis
+
+B<--man> show man page
+
+B<--version> show version information
+
+
+=head1 USAGE
+
+script usage here
+ 
+ slstidy.pl --option argument
+
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of slstidy.
+
+This software is copyright (c) 2023 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+L<http://dev.perl.org/licenses/>
+
+=cut

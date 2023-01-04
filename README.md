@@ -1,20 +1,17 @@
+
 # NAME
 
-App::slstidy - Module abstract (<= 44 characters) goes here
+slstidy - script short description
 
 # SYNOPSIS
 
-Synopsis goes here
+`slstidy.pl [--option] <arguments>`
 
 # DESCRIPTION
 
-Description goes here
+slstidy.pl script long description
 
 # OPTIONS
-
-**--option|o** Option one
-
-**--option|o** Option two
 
 **--help** show help synopsis
 
@@ -24,8 +21,11 @@ Description goes here
 
 # USAGE
 
-Usage goes here
-
+script usage here
+```
+slstidy.pl --option argument
+```
+  
 # AUTHOR
 
 Andrew Speer <andrew.speer@isolutions.com.au>
@@ -42,4 +42,3 @@ the same terms as the Perl 5 programming language system itself.
 Full license text is available at:
 
 <http://dev.perl.org/licenses/>
-
