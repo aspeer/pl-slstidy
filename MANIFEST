@@ -1,0 +1,15 @@
+Changes
+INSTALL
+INSTALL.md
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+README.md
+bin/slstidy.pl
+lib/App/slstidy.pm
+lib/App/slstidy/Constant.pm
+lib/App/slstidy/Opt.pm
+lib/App/slstidy/Util.pm
+cpanfile                                 
