@@ -242,9 +242,18 @@ sub slstidy {
         #print "in jinja: $in_jinja, line: $line_no, line:$line\n";
         
         
-        #  SLS => SLSPATH
+        #  SLS => SLSPATH in values. Plus keys if applicable
         #
-        #$line=~s/:.*\{\{\s*sls\s*\}\}/{{ slspath }}/i;
+        $line=~s/([:-].*?)\{\{\s*sls\s*\}\}/$1\{\{ slspath \}\}/i;
+        #$line=~s/^.*\'?(.*?)\{\{\s*salt\.random\.shadow_hash\(\)\s*\}\}(.*?)(?=[-:])/\'\{\{ sls \}\}.$1\{\{ salt.random.shadow_hash() \}\}\'/;
+        
+        
+        
+        #\'{{ sls }}.$1{{ salt.random.shadow_hash() }}\'/;
+            
+        #  Space in {{ varname }}
+        $line=~s/\{\{\s*/{{ /ig;
+        $line=~s/\s*\}\}/ }}/ig;
         #$line=~s/(?<=:)\{\{\s*sls\s*\}\}/{{ slspath }}/gi;
         #$line=~s/\{\{\s*sls\s*\}\}/{{ slspath }}/gi;
         
@@ -348,7 +357,7 @@ sub slstidy {
     {
         my ($stdout, $stderr, $exit)=capture{ system(
             'yq',
-            '-P',
+            #'-P', # Doesn't work - doesn't quote scalar = character as value for example
             $fn_dest
         )};
         if ($exit != 0) {
