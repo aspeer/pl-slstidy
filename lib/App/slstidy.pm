@@ -144,6 +144,7 @@ sub slstidy {
     }
     else {
         $fn_dest=$self->{'dest_fn'} || "${fn_srce}.tdy";
+        $fn_dest=File::Spec->rel2abs($fn_dest);
         $fh_dest=IO::File->new($fn_dest, O_CREAT|O_TRUNC|O_WRONLY) ||
             return err("error opening $fn_dest for write, $!");
     }
@@ -401,20 +402,21 @@ sub slstidy {
         move("${fn_dest}.yq", $fn_srce) ||
             return err("unable to move file ${fn_dest}.yq => $fn_srce: $!");	
     }
-    elsif ($self->{'dest_fn'}) {
-        move("${fn_dest}.yq", $fn_dest) ||
+    elsif (my $dest_fn=$self->{'dest_fn'}) {
+        $dest_fn=File::Spec->rel2abs($dest_fn);
+        move("${fn_dest}.yq", $dest_fn) ||
             return err("unable to move file ${fn_dest}.yq => $fn_dest: $!");	
     }
     
     
     #  Cleanup unless asked to preserve intermediate files
     #
-    unless ($self->{'preserve'}) {
+    unless ($self->{'preserve'} || $self->{'dest_fn'}) {
         unlink($fn_dest) ||
             return err("unable to unlink $fn_dest, $!"); 
     }
-    else {
-        msg("file $fn_srce: preserving intermediate file $fn_dest");
+    if ($self->{'preserve'}) {
+        msg("file $fn_srce: preserving intermediate file ${fn_dest}");
     }
     
     
