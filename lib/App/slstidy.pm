@@ -243,11 +243,6 @@ sub slstidy {
         #print "in jinja: $in_jinja, line: $line_no, line:$line\n";
         
         
-        #  SLS => SLSPATH in values. Plus keys if applicable
-        #
-        $line=~s/([:-].*?)\{\{\s*sls\s*\}\}/$1\{\{ slspath \}\}/i;
-        #$line=~s/^.*\'?(.*?)\{\{\s*salt\.random\.shadow_hash\(\)\s*\}\}(.*?)(?=[-:])/\'\{\{ sls \}\}.$1\{\{ salt.random.shadow_hash() \}\}\'/;
-        
         
         
         #\'{{ sls }}.$1{{ salt.random.shadow_hash() }}\'/;
@@ -264,6 +259,17 @@ sub slstidy {
         if ($line=~/^(.*?)\{\{(.*)\}\}\s*:\s*(.*)/) {
             $line="${1}'{{$2}}': $3";
         }
+
+
+        #  SLS => SLSPATH in values. Plus keys if applicable
+        #
+        $line=~s/([:-].*?)\{\{\s*sls\s*\}\}/$1\{\{ slspath \}\}/i;
+        unless ($line=~/\{\{\s*sls\s*\}\}.*?[:-]/) {
+            #print $line, $/;
+            $line=~s/^(.*)\'+(.*?)\{\{\s*salt\.random\.shadow_hash\(\)\s*\}\}(.*?)(?=[-:])/$1\'\{\{ sls \}\}.$2\{\{ salt.random.shadow_hash() \}\}\'/;
+            #print $line, $/;
+        }
+
 
 
         #  Quote values with {{
