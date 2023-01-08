@@ -132,37 +132,37 @@ sub slstidy {
     
     #  Get self ref, file name we are operating on
     #
-    my ($self, $fn_srce)=@_;
-    msg("file $fn_srce: processing start");
+    my ($self, $srce_fn)=@_;
+    msg("file $srce_fn: processing start");
     
     
     #  Dest file name and open handle
     #
-    my ($fn_dest, $fh_dest);
+    my ($dest_fn, $dest_fh);
     if ($self->{'dryrun'}) {
-        ($fh_dest, $fn_dest)=tempfile();
+        ($dest_fh, $dest_fn)=tempfile(SUFFIX => '.tdy');
     }
     else {
-        $fn_dest=$self->{'dest_fn'} || "${fn_srce}.tdy";
-        $fn_dest=File::Spec->rel2abs($fn_dest);
-        $fh_dest=IO::File->new($fn_dest, O_CREAT|O_TRUNC|O_WRONLY) ||
-            return err("error opening $fn_dest for write, $!");
+        $dest_fn=$self->{'dest_fn'} ? $self->{'dest_fn'}.'.tdy' : "${srce_fn}.tdy";
+        $dest_fn=File::Spec->rel2abs($dest_fn);
+        $dest_fh=IO::File->new($dest_fn, O_CREAT|O_TRUNC|O_WRONLY) ||
+            return err("error opening $dest_fn for write, $!");
     }
-    #my ($fh_dest, $fn_dest)=tempfile(UNLINK => 1);
+    #my ($dest_fh, $dest_fn)=tempfile(UNLINK => 1);
     
     
     #  Make backup
     #
     unless ($self->{'nobackup'} || $self->{'dryrun'}) {
-        copy($fn_srce, "${fn_srce}.bak") ||
-            return err("unable to make backup copy of $fn_srce, $!")
+        copy($srce_fn, "${srce_fn}.bak") ||
+            return err("unable to make backup copy of $srce_fn, $!")
     }
 
 
     #  Source file handle
     #
-    my $fh_srce=IO::File->new($fn_srce, O_RDONLY) ||
-        return err("unable to open $fn_srce for reading: $!");
+    my $srce_fh=IO::File->new($srce_fn, O_RDONLY) ||
+        return err("unable to open $srce_fn for reading: $!");
         
 
     #  Start reading line by line, add document start if not present on first line
@@ -173,7 +173,7 @@ sub slstidy {
     my $in_jinja=0;
     my $line_no=0;
     my @line;
-    while (my $line=<$fh_srce>) {
+    while (my $line=<$srce_fh>) {
     
     
         #  Keep track of what line we are on
@@ -188,7 +188,7 @@ sub slstidy {
             $doc_start_seen++;
         }
         if (!$doc_start_seen && !(($line =~ /^\#/) || ($line=~/^\%/))) {
-            print $fh_dest '---', $/;
+            print $dest_fh '---', $/;
             $doc_start_seen++;
         }
         
@@ -311,44 +311,45 @@ sub slstidy {
         last if ($line[$line_ix]!~/^\s*$/);
         splice @line, ($line_ix);
     }
-    map { print $fh_dest $_, $/ } @line;
+    map { print $dest_fh $_, $/ } @line;
     
     
     #  Add document end footer if not seen in document. REMOVED - not prited by YQ anyway
     #
     #unless ($doc_end_seen) {
-    #    print $fh_dest '...', $/;
+    #    print $dest_fh '...', $/;
     #}
     
     
     #  Close file handles
     #
-    $fh_dest->close();
-    $fh_srce->close();
+    $dest_fh->close();
+    $srce_fh->close();
     
     
     #  Now run through pretty print
     #
+    my $yq_fn="${dest_fn}.yq";
     {
         my ($stdout, $stderr, $exit)=capture{ system(
             'yq',
             #'-P', # Doesn't work - doesn't quote scalar = character as value for example
-            $fn_dest
+            $dest_fn
         )};
         if ($exit != 0) {
-            #copy($fn_dest, my $fn_tidy=File::Spec->catfile(cwd(), [File::Spec->splitpath($fn_srce)]->[2].'.tdy'));
-            return err("yq command exited with non-zero code: $exit, output was: $stderr, tdy file: $fn_dest");
+            #copy($dest_fn, my $fn_tidy=File::Spec->catfile(cwd(), [File::Spec->splitpath($srce_fn)]->[2].'.tdy'));
+            return err("yq command exited with non-zero code: $exit, output was: $stderr, tdy file: $dest_fn");
         }
         else {
-            msg("file $fn_dest: yq format OK")
+            msg("file $dest_fn: yq format OK")
         }
         
         #  And save
         #
-        my $fh_yq=IO::File->new("${fn_dest}.yq", O_CREAT|O_TRUNC|O_WRONLY) ||
-            return err("unable to open file ${fn_dest}.yq for output, $!");
-        print $fh_yq $stdout;
-        $fh_yq->close();
+        my $yq_fh=IO::File->new($yq_fn, O_CREAT|O_TRUNC|O_WRONLY) ||
+            return err("unable to open file $yq_fn for output, $!");
+        print $yq_fh $stdout;
+        $yq_fh->close();
         
     }
     
@@ -358,14 +359,14 @@ sub slstidy {
     {
         my ($stdout, $stderr, $exit)=capture{ system(
             'yamllint',
-            "${fn_dest}.yq"
+            $yq_fn
         )};
         if ($exit != 0) {
-            #copy($fn_lint, my $fn_tidy=File::Spec->catfile(cwd(), [File::Spec->splitpath($fn_srce)]->[2].'.tdy.yq'));
-            return err("yaml linter exited with non-zero code: $exit, output was: $stdout. tdy.yq file: ${fn_dest}.yq");
+            #copy($fn_lint, my $fn_tidy=File::Spec->catfile(cwd(), [File::Spec->splitpath($srce_fn)]->[2].'.tdy.yq'));
+            return err("yaml linter exited with non-zero code: $exit, output was: $stdout. tdy.yq file: $yq_fn");
         }
         else {
-            msg("file $fn_dest.yq: yaml linter OK");
+            msg("file $yq_fn: yaml linter OK");
         }
     }
     
@@ -373,24 +374,27 @@ sub slstidy {
     #  Now move file back to inplace if that is what is needed
     #
     if ($self->{'inplace'}) {
-        move("${fn_dest}.yq", $fn_srce) ||
-            return err("unable to move file ${fn_dest}.yq => $fn_srce: $!");	
+        move($yq_fn, $srce_fn) ||
+            return err("unable to move file $yq_fn => $srce_fn: $!");	
     }
-    elsif (my $dest_fn=$self->{'dest_fn'}) {
-        $dest_fn=File::Spec->rel2abs($dest_fn);
-        move("${fn_dest}.yq", $dest_fn) ||
-            return err("unable to move file ${fn_dest}.yq => $fn_dest: $!");	
+    elsif ((my $dest_opt_fn=$self->{'dest_fn'}) && !$self->{'dryrun'}) {
+        $dest_opt_fn=File::Spec->rel2abs($dest_opt_fn);
+        move($yq_fn, $dest_opt_fn) ||
+            return err("unable to move file $yq_fn => $dest_opt_fn: $!");	
+    }
+    elsif ($self->{'dryrun'}) {
+        msg("file $dest_fn not saving to output file '$dest_opt_fn' as --dryrun option in effect");
     }
     
     
     #  Cleanup unless asked to preserve intermediate files
     #
     unless ($self->{'preserve'} || $self->{'dest_fn'}) {
-        unlink($fn_dest) ||
-            return err("unable to unlink $fn_dest, $!"); 
+        unlink($dest_fn) ||
+            return err("unable to unlink $dest_fn, $!"); 
     }
     if ($self->{'preserve'}) {
-        msg("file $fn_srce: preserving intermediate file ${fn_dest}");
+        msg("file $srce_fn: preserving intermediate file ${dest_fn}");
     }
     
     
