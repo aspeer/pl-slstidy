@@ -203,7 +203,6 @@ sub slstidy {
         #
         if ($line=~/:\s*True\s*$/) {
             $line=~s/:\s*True\s*$/: true/;
-            #$line.=$/;
         }
         
         #  Is this a new line ? Make sure not more than 2
@@ -240,73 +239,44 @@ sub slstidy {
         $in_jinja+=($line=~/\{\%/);
         $in_jinja+=($line=~/\%\}/);
         $in_jinja%=2;
-        #print "in jinja: $in_jinja, line: $line_no, line:$line\n";
-        
-        
-        
-        
-        #\'{{ sls }}.$1{{ salt.random.shadow_hash() }}\'/;
             
+
         #  Space in {{ varname }}
         $line=~s/\{\{\s*/{{ /ig;
         $line=~s/\s*\}\}/ }}/ig;
-        #$line=~s/(?<=:)\{\{\s*sls\s*\}\}/{{ slspath }}/gi;
-        #$line=~s/\{\{\s*sls\s*\}\}/{{ slspath }}/gi;
         
         
-        #  Quote keys using {{
+        #  Single quote keys with {{ in content
         #
         if ($line=~/^(.*?)\{\{(.*)\}\}\s*:\s*(.*)/) {
             $line="${1}'{{$2}}': $3";
         }
 
 
-        #  SLS => SLSPATH in values. Plus keys if applicable
+        #  SLS => SLSPATH in values. Plus keys if applicable, add {{ sls }} to any {{ salt.random.shadow_hash()
+        #  }} keys
         #
         $line=~s/([:-].*?)\{\{\s*sls\s*\}\}/$1\{\{ slspath \}\}/i;
         unless ($line=~/\{\{\s*sls\s*\}\}.*?[:-]/) {
-            #print $line, $/;
             $line=~s/^(.*)\'+(.*?)\{\{\s*salt\.random\.shadow_hash\(\)\s*\}\}(.*?)(?=[-:])/$1\'\{\{ sls \}\}.$2\{\{ salt.random.shadow_hash() \}\}\'/;
-            #print $line, $/;
         }
 
 
-
-        #  Quote values with {{
-        #
-        #if ($line=~.*/) {
-        #    $line="'{{$1}}': $2";
-        #}
-        #$line=~s/({{)(?!.*:)/'$1/g;
-        #$line=~s/(}})(?!.*:)/$1'/g;
-        #$line=~s/'{2}/'/g;
-        
         #  Clumsy regxp to quote lines with jinja variables {{. First check if value is quoted already - if so leave it
         #
-        #print "line: $line\n";
         if ($line=~/^(.*?)[:-]\s+\S/) {
             unless ($line=~/^(.*?)[:-]\s+['""](.*)['""]$/) {
             
                 #  Does it contain a single quote somewhere in the value already ? If so double quote it
                 #
                 if ($line=~/^.*?[:-].*'/) {
-                    #print "hit 1\n";
-                    #$line=~s/^(.*?)([:-])\s+(.*?\{\{.*\}\}.*)$/$1$2 "$3"/g;
                     unless ($line=~s/^(.*?)(?!-)([:-])\s+(.*?\{\{.*\}\}.*)$/$1$2 "$3"/g) { 
                         $line=~s/^(.*?)([:-])\s+(.*?\{\{.*\}\}.*)$/$1$2 "$3"/g }
                     $line=~s/"{2,}/"/g;
                 }
-                #  And vica vesra if contains a double quote
-                #
-                #elsif ($line=~/^.*?[:-].*"/) {
-                #    $line=~s/^(.*?)([:-])\s+(.*?\{\{.*\}\}.*)$/$1$2 '$3'/g;
-                #    $line=~s/'{2,}/'/g;
-                #}
                 #  Otherwise single quote it
                 #
                 else {
-                    #print "hit 2\n";
-                    #$line=~s/^(.*?)([:-])\s+(.*?\{\{.*\}\}.*)$/$1$2 '$3'/g;
                     unless ($line=~s/^(.*?)(?!-)([:-])\s+(.*?\{\{.*\}\}.*)$/$1$2 '$3'/g) {
                         $line=~s/^(.*?)([:-])\s+(.*?\{\{.*\}\}.*)$/$1$2 '$3'/g
                     }
@@ -315,8 +285,7 @@ sub slstidy {
                 
             }
         }
-        #print "line: $line\n";
-            
+
 
         #  At least two spaces betwee start of comment and text
         #
@@ -332,11 +301,11 @@ sub slstidy {
         
         #  OK - print it out
         #
-        #print $fh_dest $line, $/;
         push @line, $line;
     }
     
-    #  Get rid of trailing lines at end of file
+
+    #  Get rid of trailing empty lines at end of file
     #
     for (my $line_ix=$#line; $line_ix > 0; $line_ix--) {
         last if ($line[$line_ix]!~/^\s*$/);
@@ -360,7 +329,6 @@ sub slstidy {
     
     #  Now run through pretty print
     #
-    #my ($fh_lint, $fn_lint)=tempfile(UNLINK=>1);
     {
         my ($stdout, $stderr, $exit)=capture{ system(
             'yq',
