@@ -171,6 +171,7 @@ sub slstidy {
     my $doc_end_seen;
     my $nl_count=0;
     my $in_jinja=0;
+    my @in_jinja;
     my $line_no=0;
     my @line;
     while (my $line=<$srce_fh>) {
@@ -225,20 +226,61 @@ sub slstidy {
         
         #  Comment out Jinja syntax
         #
-        $line=~s/^\s*\{\%/#  \{\%/;
-        $line=~s/^\s*\%\}/#  \%\}/;
+        #$line=~s/^\s*\{\%/#  \{\%/;
+        ##$line=~s/^\s*\%\}/#  \%\}/;
         
         
-        #  Keep track if in or out of jinja block and comment out if in block
+        #  Keep track if in or out of jinja block and comment out if in block.
+        #  
+        #  UPDATE. Breaks Jinja. No multiline statements for you.
         #
-        if ($in_jinja) {
-            unless ($line=~/^#/) {
-                $line="#  ${line}";
-            }
+        #if ($in_jinja) {
+            #unless ($line=~/^#/) {
+            #    $line="#  ${line}";
+            #}
+        #}
+        #$in_jinja+=($line=~/\{\%/);
+        #$in_jinja+=($line=~/\%\}/);
+        #$in_jinja%=2;
+        if ($line=~/\{\%/ && $line =~/\%\}/) {
+            #  All on one line. Just comment out if needed and continue
+            #
+            #print "line 0: $line\n";
+            $line=~s/^\s*\{\%/#  \{\%/;
         }
-        $in_jinja+=($line=~/\{\%/);
-        $in_jinja+=($line=~/\%\}/);
-        $in_jinja%=2;
+        elsif ($line=~/\{\%/ && $line !~/\%\}/) {
+            #  Onlt start of Jinja line or already in block. Push and loop
+            #
+            #print "line 1: $line\n";
+            push @in_jinja, $line;
+            $in_jinja=1;
+            next;
+        }
+        elsif ($line !~/\{\%/ && $line =~/\%\}/) {
+            #  End of Jinja, consolidate and continue
+            #
+            #print "line 2: $line\n";
+            $line=~s/^\s*//;
+            $line=join('', @in_jinja, $line);
+            $in_jinja=0;
+            @in_jinja=();
+            $line=~s/^\s*\{\%/#  \{\%/;
+        }
+        elsif ($in_jinja) {
+            #  Still in Jinja block.
+            #
+            $line=~s/^\s*//;
+            push @in_jinja, $line;
+            next;
+        }
+        #print "line: $line\n";
+        
+        #elsif ($in_jinja) {
+        #    #  Still in Jinja block.
+        #    #
+        #    puh
+            
+
             
 
         #  Space in {{ varname }}
