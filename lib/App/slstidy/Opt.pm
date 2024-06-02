@@ -32,7 +32,7 @@ use App::slstidy::Constant;
 #  External modules
 #
 use Pod::Usage;
-use FindBin qw($RealBin $Script);
+use FindBin      qw($RealBin $Script);
 use Getopt::Long qw(GetOptions :config auto_help);
 
 
@@ -56,7 +56,6 @@ use constant {
 };
 
 
-
 #  Export functions
 #
 use base 'Exporter';
@@ -71,6 +70,7 @@ $VERSION='0.001';
 #  All done, init finished
 #
 1;
+
 #===================================================================================================
 
 
@@ -80,20 +80,21 @@ $VERSION='0.001';
 
 #===================================================================================================
 
+
 sub getopt {
 
 
     #  ARGV usually supplied as array ref but could be anyting
     #
     my ($opt_ar, $opt_default_hr)=@_;
-    
-    
+
+
     #  Update defaults from local home directory if file present
     #
     my %opt_defaults=%{$opt_default_hr};
     if (-f (my $opt_defaults_fn=glob("~/.${Script}.option"))) {
         debug("opt defaults file found: $opt_defaults_fn");
-        my $hr=eval { do($opt_defaults_fn) } ||
+        my $hr=eval {do($opt_defaults_fn)} ||
             return err("error reading options file $opt_defaults_fn, check syntax");
         debug('opt defaults file: %s', Dumper($hr));
         %opt_defaults=(%opt_defaults, %{$hr});
@@ -119,14 +120,16 @@ sub getopt {
     #  Routine to capture files/names/other actions to process into array
     #
     my $arg_cr=sub {
+
         #  Eval to handle different Getopt:: module versions.
-        push @{$opt{'action_ar'}}, eval { $_[0]->name } || $_[0];
+        push @{$opt{'action_ar'}}, eval {$_[0]->name} || $_[0];
     };
 
 
     #  Add standard options to option array ref
     #
     my @opt=(@{+OPTION_AR}, @{$opt_ar}, '<>' => $arg_cr);
+
     #  Removed \\ '' => \${opt {'stdin'} \\ input.
     debug('option array: %s', Dumper(\@opt));
 
@@ -135,21 +138,20 @@ sub getopt {
     #
     GetOptions(\%opt, @opt) ||
         pod2usage(2);
-    if ($opt{'help'}) { # || !$opt{'action_ar'}) {
-        pod2usage( -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|USAGE', -exitval => 1 )
+    if ($opt{'help'}) {    # || !$opt{'action_ar'}) {
+        pod2usage(-verbose => 99, -sections => 'SYNOPSIS|OPTIONS|USAGE', -exitval => 1)
     }
     elsif ($opt{'man'}) {
-        pod2usage( -exitstatus=>0, -verbose => 2 ) if $opt{'man'};
+        pod2usage(-exitstatus => 0, -verbose => 2) if $opt{'man'};
     }
     elsif ($opt{'version'}) {
         exit print "$Script version: $VERSION\n";
-    };
-    
-    
+    }
+
+
     #  Dump options if required, set debugging
     #
-    {
-        no strict qw(refs);
+    {   no strict qw(refs);
         (my $script=$Script)=~s/\.pl$//;
         ${"${script}::DEBUG"}++ if $opt{'debug'};
     }

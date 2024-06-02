@@ -19,7 +19,7 @@ package App::slstidy::Constant;
 #  Pragma
 #
 use strict qw(vars);
-use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
+use vars   qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
 use warnings;
 
 
@@ -38,10 +38,10 @@ my $local_fn=abs_path(__FILE__) . '.local';
 #  <<<
 %Constant=(
 
-    
+
     #  Default file extension to look for when processing recursive files
     #
-    SLS_FILE_EXTENSION		=> 'sls',
+    SLS_FILE_EXTENSION => 'sls',
 
 
     #  Local constants override anything above
@@ -50,6 +50,7 @@ my $local_fn=abs_path(__FILE__) . '.local';
     %{do(glob(sprintf('~/.%s.local', __PACKAGE__))) || {}}    # || {} avoids warning
 
 );
+
 # >>>
 
 
@@ -66,4 +67,5 @@ foreach (keys %Constant) {${$_}=$Constant{$_}}
 #  All done, init finished
 #
 1;
+
 #===================================================================================================

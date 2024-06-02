@@ -24,7 +24,7 @@ use warnings;
 #
 use App::slstidy;
 use App::slstidy::Util qw(msg err debug Dumper);
-use App::slstidy::Opt qw(getopt);
+use App::slstidy::Opt  qw(getopt);
 use App::slstidy::Constant;
 
 
@@ -48,7 +48,7 @@ use constant {
         'dest_fn|d=s',
         'inplace',
         'dryrun',
-        'preserve' # preserve intermediate files, don't delete
+        'preserve'    # preserve intermediate files, don't delete
 
     ],
 
@@ -69,7 +69,7 @@ $VERSION='0.001';
 
 #  Run main
 #
-exit(${&main(&getopt(+OPTION_AR, +OPTION_DEFAULT_HR)) || die err ()} || 0);    # || 0 stops warnings
+exit(${&main(&getopt(+OPTION_AR, +OPTION_DEFAULT_HR)) || die err()} || 0);    # || 0 stops warnings
 
 
 #===================================================================================================
@@ -81,7 +81,7 @@ sub main {    #no subsort
     #  Get base object blassed with options as first arg.
     #
     my $self=App::slstidy->new(shift());
-    
+
 
     #  Do something
     #

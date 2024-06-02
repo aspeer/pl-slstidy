@@ -53,6 +53,7 @@ $Script=~s/\.pl$//;
 #  All done, init finished
 #
 1;
+
 #==================================================================================================
 
 
@@ -60,9 +61,8 @@ sub debug {
 
     #  Debug
     #
-    { 
-        no strict qw(refs);
-        $DEBUG ||= (${"${Script}::DEBUG"} ||=0);
+    {   no strict qw(refs);
+        $DEBUG ||= (${"${Script}::DEBUG"} ||= 0);
     }
     goto &msg if $DEBUG;
 
