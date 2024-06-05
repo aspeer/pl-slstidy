@@ -25,7 +25,7 @@ use warnings;
 
 #  Support modules
 #
-use App::slstidy::Util qw(msg err debug Dumper);
+use App::slstidy::Util qw(msg err debug debug_set quiet_set Dumper);
 use App::slstidy::Constant;
 
 
@@ -151,17 +151,19 @@ sub getopt {
 
     #  Dump options if required, set debugging
     #
-    {   no strict qw(refs);
-        (my $script=$Script)=~s/\.pl$//;
-        ${"${script}::DEBUG"}++ if $opt{'debug'};
-    }
+    #{   no strict qw(refs);
+    #    (my $script=$Script)=~s/\.pl$//;
+    #    ${"${script}::DEBUG"}++ if $opt{'debug'};
+    #}
+    quiet_set($opt{'quiet'});
+    debug_set($opt{'debug'});
     debug('stage 2 opt: %s', Dumper(\%opt));
     die Dumper(\%opt) if $opt{'dump_opt'};
     
     
     #  Null out msg function if we want quiet
     #
-    *msg=sub {} if $opt{'quiet'};
+    #*msg=sub {} if $opt{'quiet'};
 
 
     #  Done

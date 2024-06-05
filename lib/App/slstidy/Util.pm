@@ -19,7 +19,7 @@ package App::slstidy::Util;
 #  Pragma
 #
 use strict;
-use vars qw($VERSION $DEBUG @EXPORT_OK);
+use vars qw($VERSION @EXPORT_OK);
 use warnings;
 
 
@@ -35,7 +35,7 @@ $Data::Dumper::Terse=1;
 #  Export functions
 #
 use base 'Exporter';
-@EXPORT_OK=qw(err msg arg debug script realbin Dumper);
+@EXPORT_OK=qw(err msg arg debug debug_set quiet_set verbose_set script realbin Dumper);
 
 
 #  Version information in a format suitable for CPAN etc. Must be
@@ -46,8 +46,9 @@ $VERSION='0.001';
 
 #  Debugging on ?
 #
-$Script=~s/\.pl$//;
-($Carp::Verbose=++$DEBUG) if $ENV{uc("${Script}_DEBUG")};
+#$Script=~s/\.pl$//;
+#($Carp::Verbose=++$DEBUG) if $ENV{uc("${Script}_DEBUG")};
+our ($Debug, $Quiet, $Verbose);    
 
 
 #  All done, init finished
@@ -62,9 +63,9 @@ sub debug {
     #  Debug
     #
     {   no strict qw(refs);
-        $DEBUG ||= (${"${Script}::DEBUG"} ||= 0);
+        $Debug ||= (${"${Script}::DEBUG"} ||= 0);
     }
-    goto &msg if $DEBUG;
+    goto &msg if $Debug;
 
 }
 
@@ -99,8 +100,23 @@ sub msg {
 
     #  Print message
     #
-    return CORE::print &fmt(@_), "\n";
+    return (CORE::print &fmt(@_), "\n") unless $Quiet;
 
+}
+
+
+sub debug_set {
+    $Debug=$Carp::Verbose=shift()
+}
+
+
+sub quiet_set {
+    $Quiet=shift();
+}
+
+
+sub verbose_set {
+    $Verbose=shift();
 }
 
 
