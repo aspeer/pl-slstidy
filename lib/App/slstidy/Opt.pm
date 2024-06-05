@@ -45,7 +45,7 @@ use constant {
     #
     OPTION_AR => [
 
-        qw(man verbose version|V quiet debug dump_opt),
+        qw(man verbose version|V quiet debug dump_opt|dump-opt),
     ],
 
 
@@ -157,6 +157,11 @@ sub getopt {
     }
     debug('stage 2 opt: %s', Dumper(\%opt));
     die Dumper(\%opt) if $opt{'dump_opt'};
+    
+    
+    #  Null out msg function if we want quiet
+    #
+    *msg=sub {} if $opt{'quiet'};
 
 
     #  Done
