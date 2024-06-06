@@ -1,0 +1,17 @@
+---
+#  Test quoting of keys
+#
+key:
+    - value
+
+'{{ sls }}.{{ salt.random.shadow_hash() }}':
+    test:
+        - name: foobar
+
+'{{ sls }}.packages.{{ salt.random.shadow_hash() }}':
+    test:
+        - name: foobar
+
+'{{ sls }}.{{ salt.random.shadow_hash() }}':
+    test:
+        - name: gherkin

@@ -1,0 +1,15 @@
+---
+foo:
+    - name: '{{ slspath }}'
+
+bar:
+    - name: '{{ slspath }}'
+
+car:
+    - name: "{{ slspath }}"
+
+dar:
+    - name: "Test {{ sls['salt'] }}"
+
+ear:
+    - name: 'Test {{ sls["salt"] }}'
