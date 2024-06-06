@@ -1,7 +1,7 @@
 #
 #  This file is part of slstidy.
 #
-#  This software is copyright (c) 2023 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2024 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -159,8 +159,8 @@ sub getopt {
     debug_set($opt{'debug'});
     debug('stage 2 opt: %s', Dumper(\%opt));
     die Dumper(\%opt) if $opt{'dump_opt'};
-    
-    
+
+
     #  Null out msg function if we want quiet
     #
     #*msg=sub {} if $opt{'quiet'};

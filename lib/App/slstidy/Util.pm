@@ -1,7 +1,7 @@
 #
 #  This file is part of slstidy.
 #
-#  This software is copyright (c) 2023 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2024 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -48,7 +48,7 @@ $VERSION='0.001';
 #
 #$Script=~s/\.pl$//;
 #($Carp::Verbose=++$DEBUG) if $ENV{uc("${Script}_DEBUG")};
-our ($Debug, $Quiet, $Verbose);    
+our ($Debug, $Quiet, $Verbose);
 
 
 #  All done, init finished
@@ -67,6 +67,11 @@ sub debug {
     }
     goto &msg if $Debug;
 
+}
+
+
+sub debug_set {
+    $Debug=$Carp::Verbose=shift()
 }
 
 
@@ -105,18 +110,13 @@ sub msg {
 }
 
 
-sub debug_set {
-    $Debug=$Carp::Verbose=shift()
-}
-
-
 sub quiet_set {
     $Quiet=shift();
 }
 
 
-sub verbose_set {
-    $Verbose=shift();
+sub realbin {
+    $RealBin
 }
 
 
@@ -125,8 +125,8 @@ sub script {
 }
 
 
-sub realbin {
-    $RealBin
+sub verbose_set {
+    $Verbose=shift();
 }
 
 

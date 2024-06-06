@@ -1,7 +1,7 @@
 #
 #  This file is part of slstidy.
 #
-#  This software is copyright (c) 2023 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2024 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -148,7 +148,7 @@ sub slstidy {
 
     #  Dest file name and open handle
     #
-    my $temp_fh=File::Temp->new(SUFFIX => '.tdy', UNLINK=>1 ) ||
+    my $temp_fh=File::Temp->new(SUFFIX => '.tdy', UNLINK => 1) ||
         return err('unable to create new File::Tenp object');
     my $temp_fn=$temp_fh->filename() ||
         return err('File::Temp unable to return dest filename');
@@ -413,6 +413,8 @@ sub slstidy {
     {   my ($stdout, $stderr, $exit)=capture {
             system(
                 'yamllint',
+                '-c',
+                $YAMLLINT_DOT_FN,
                 $yq_fn
             )
         };
@@ -425,21 +427,23 @@ sub slstidy {
             msg("file $srce_fn: yaml linter OK");
         }
     }
-    
+
 
     #  If preserving intermediate files keep them
-    #    
+    #
     if ($self->{'preserve'}) {
         my $fn1=File::Spec->rel2abs("${srce_fn}.yq");
+
         #my $fn1=File::Spec->rel2abs("${srce_fn}.yq2");
         copy($temp_fn, $fn1) ||
             return err("unable to preserve intermediate stage1, error copying $temp_fn => $fn1");
+
         #copy($yq_fn, $fn2) ||
         #    return err("unable to preserve intermediate stage1, error copying $yq_fn => $fn2");
         msg("file $srce_fn: preserving intermediate file to ${srce_fn}.yq");
     }
-    
-    
+
+
     #  If dryrun that's all we want to do
     #
     if ($self->{'dryrun'}) {
@@ -454,9 +458,9 @@ sub slstidy {
         move($yq_fn, $srce_fn) ||
             return err("unable to move file $yq_fn => $srce_fn: $!");
         msg("file $srce_fn: updated in-place");
-        
+
     }
-    
+
 
     #  Or write to output file/STDOUT
     #
@@ -464,10 +468,11 @@ sub slstidy {
         if ($dest_fn eq '-') {
             my $yq_fh=IO::File->new($yq_fn, O_RDONLY) ||
                 return err("unable to open yq output file $yq_fn: $!");
+
             #while (<$dest_opt_fh>) {
             #    print, $/;
             #}
-            map { CORE::print STDOUT } <$yq_fh>;
+            map {CORE::print STDOUT} <$yq_fh>;
             $yq_fh->close();
             unlink $yq_fn ||
                 return err("unable to unlink $yq_fn, $!");
@@ -479,14 +484,13 @@ sub slstidy {
             msg("file $srce_fn: wrote output to $dest_fn");
         }
     }
-        
-    
+
+
     #  Done
     #
     return \undef;
 
 }
-
 
 
 sub slstidy0 {
@@ -510,6 +514,7 @@ sub slstidy0 {
         $dest_fh=IO::File->new($dest_fn, O_CREAT | O_TRUNC | O_WRONLY) ||
             return err("error opening $dest_fn for write, $!");
     }
+
     #die $dest_fn;
 
     #my ($dest_fh, $dest_fn)=tempfile(UNLINK => 1);
@@ -799,10 +804,11 @@ sub slstidy0 {
         if ($dest_opt_fn eq '-') {
             my $dest_opt_fh=IO::File->new($yq_fn, O_RDONLY) ||
                 return err("unable to open yq output file $yq_fn: $!");
+
             #while (<$dest_opt_fh>) {
             #    print, $/;
             #}
-            map { CORE::print } <$dest_opt_fh>;
+            map {CORE::print} <$dest_opt_fh>;
             $dest_opt_fh->close();
             unlink $yq_fn ||
                 return err("unable to delete yq outoput file $yq_fn: $!")
@@ -814,7 +820,7 @@ sub slstidy0 {
         }
     }
     elsif ($self->{'dryrun'}) {
-        $dest_opt_fn ||= ''; # Stop warnings if not defined
+        $dest_opt_fn ||= '';    # Stop warnings if not defined
         msg("file $dest_fn not saving to output file '$dest_opt_fn' as --dryrun option in effect");
     }
     die $yq_fn;
@@ -874,7 +880,7 @@ Andrew Speer andrew.speer@isolutions.com.au
 
 This file is part of slstidy.
 
-This software is copyright (c) 2023 by Andrew Speer <andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2024 by Andrew Speer <andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -919,7 +925,7 @@ Andrew Speer andrew.speer@isolutions.com.au
 
 This file is part of slstidy.
 
-This software is copyright (c) 2023 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
+This software is copyright (c) 2024 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 #
 #  This file is part of slstidy.
 #
-#  This software is copyright (c) 2023 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#  This software is copyright (c) 2024 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
 #  This is free software; you can redistribute it and/or modify it under
 #  the same terms as the Perl 5 programming language system itself.
@@ -31,8 +31,9 @@ $VERSION='0.001';
 #  Get module file name and path, derive name of file to store local constants
 #
 use Cwd qw(abs_path);
+use File::Spec;
 my $local_fn=abs_path(__FILE__) . '.local';
-
+(my $local_dn=abs_path(__FILE__))=~s/\.pm$//;
 
 #  Hash of constants
 #  <<<
@@ -42,6 +43,9 @@ my $local_fn=abs_path(__FILE__) . '.local';
     #  Default file extension to look for when processing recursive files
     #
     SLS_FILE_EXTENSION => 'sls',
+
+
+    YAMLLINT_DOT_FN => File::Spec->catfile($local_dn, '.yamllint'),
 
 
     #  Local constants override anything above
