@@ -41,7 +41,7 @@ use base 'Exporter';
 #  Version information in a format suitable for CPAN etc. Must be
 #  all on one line
 #
-$VERSION='0.001';
+$VERSION='0.002';
 
 
 #  Debugging on ?

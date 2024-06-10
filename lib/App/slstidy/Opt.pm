@@ -64,7 +64,7 @@ use base 'Exporter';
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='0.001';
+$VERSION='0.002';
 
 
 #  All done, init finished
