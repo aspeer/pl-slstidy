@@ -14,7 +14,8 @@ lib/App/slstidy/Opt.pm
 lib/App/slstidy/Util.pm                  
 t/00-load.t                              
 t/01-pod.t                               
-t/02-tidy.t                              
+t/02-binary.t
+t/03-tidy.t                              
 t/comment.sls                            
 t/comment.sls.tdy.yq                     
 t/comment.sls.yq                         
