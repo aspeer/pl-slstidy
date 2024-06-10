@@ -46,6 +46,7 @@ use constant {
         'nobackup',
         'srce_fn|file_name|fn|f|s=s@',
         'dest_fn|d=s',
+        'stdout',
         'inplace',
         'dryrun',
         'preserve'    # preserve intermediate files, don't delete

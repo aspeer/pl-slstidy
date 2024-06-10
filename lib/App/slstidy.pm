@@ -464,25 +464,24 @@ sub slstidy {
 
     #  Or write to output file/STDOUT
     #
-    elsif (my $dest_fn=$self->{'dest_fn'} || "${srce_fn}.tdy") {
-        if ($dest_fn eq '-') {
-            my $yq_fh=IO::File->new($yq_fn, O_RDONLY) ||
-                return err("unable to open yq output file $yq_fn: $!");
+    my $dest_fn=($self->{'dest_fn'} || "${srce_fn}.tdy");
+    if (($dest_fn eq '-') || $self->{'stdout'}) {
+        my $yq_fh=IO::File->new($yq_fn, O_RDONLY) ||
+            return err("unable to open yq output file $yq_fn: $!");
 
-            #while (<$dest_opt_fh>) {
-            #    print, $/;
-            #}
-            map {CORE::print STDOUT} <$yq_fh>;
-            $yq_fh->close();
-            unlink $yq_fn ||
-                return err("unable to unlink $yq_fn, $!");
-        }
-        else {
-            my $tidy_fn=File::Spec->rel2abs($dest_fn);
-            move($yq_fn, $tidy_fn) ||
-                return err("unable to move file $yq_fn => $tidy_fn: $!");
-            msg("file $srce_fn: wrote output to $dest_fn");
-        }
+        #while (<$dest_opt_fh>) {
+        #    print, $/;
+        #}
+        map {CORE::print STDOUT} <$yq_fh>;
+        $yq_fh->close();
+        unlink $yq_fn ||
+            return err("unable to unlink $yq_fn, $!");
+    }
+    else {
+        my $tidy_fn=File::Spec->rel2abs($dest_fn);
+        move($yq_fn, $tidy_fn) ||
+            return err("unable to move file $yq_fn => $tidy_fn: $!");
+        msg("file $srce_fn: wrote output to $dest_fn");
     }
 
 
