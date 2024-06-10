@@ -204,11 +204,20 @@ sub slstidy {
             $doc_end_seen++;
         }
 
+
         #  Lower case True=>true
         #
-        if ($line=~/:\s*True\s*$/) {
-            $line=~s/:\s*True\s*$/: true/;
+        if ($line=~/:\s*True\s*$/i) {
+            $line=~s/:\s*True\s*$/: true/i;
         }
+
+
+        #  Lower case False=>false
+        #
+        if ($line=~/:\s*False\s*$/i) {
+            $line=~s/:\s*False\s*$/: false/i;
+        }
+
 
         #  Is this a new line ? Make sure not more than 2
         #
@@ -281,13 +290,6 @@ sub slstidy {
             push @in_jinja, $line;
             next;
         }
-
-        #print "line: $line\n";
-
-        #elsif ($in_jinja) {
-        #    #  Still in Jinja block.
-        #    #
-        #    puh
 
 
         #  Space in {{ varname }}
@@ -433,13 +435,8 @@ sub slstidy {
     #
     if ($self->{'preserve'}) {
         my $fn1=File::Spec->rel2abs("${srce_fn}.yq");
-
-        #my $fn1=File::Spec->rel2abs("${srce_fn}.yq2");
         copy($temp_fn, $fn1) ||
             return err("unable to preserve intermediate stage1, error copying $temp_fn => $fn1");
-
-        #copy($yq_fn, $fn2) ||
-        #    return err("unable to preserve intermediate stage1, error copying $yq_fn => $fn2");
         msg("file $srce_fn: preserving intermediate file to ${srce_fn}.yq");
     }
 
