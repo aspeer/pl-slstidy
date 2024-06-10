@@ -132,7 +132,7 @@ requirements but it is hoped the script may be generally useful.
 
 **--version** show version information
 
-**--quiet don't output any status information
+**--quiet** don't output any status information
 
 **--recurse** iterate through all sls file in the current and lower directories
 
@@ -214,7 +214,7 @@ B<--man> show man page
 
 B<--version> show version information
 
-**--quiet don't output any status information
+B<--quiet> don't output any status information
 
 B<--recurse> iterate through all sls file in the current and lower directories
 
